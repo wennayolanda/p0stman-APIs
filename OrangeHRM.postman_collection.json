@@ -1,0 +1,2380 @@
+{
+	"info": {
+		"_postman_id": "c5d66d61-63f6-453b-9f73-23b889532e12",
+		"name": "OrangeHRM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23948757"
+	},
+	"item": [
+		{
+			"name": "access token",
+			"item": [
+				{
+					"name": "get-access-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"pm.globals.set(\"token\", response.access_token);",
+									"",
+									"pm.test(\"verify status code response : [200]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "client_id",
+									"value": "api-client",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "942d36a36d6bf422a36f5871f905b6e5",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/oauth/issueToken",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"oauth",
+								"issueToken"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "job titles",
+					"item": [
+						{
+							"name": "job-title-add",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [201]\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data from Employee Job Title\", function () {",
+											"    ",
+											"    //set variable",
+											"    const jsonData = pm.response.json();",
+											"    const data = jsonData.data;",
+											"",
+											"    pm.expect(data.jobTitleName).to.eql(pm.globals.get(\"setJobTitleName\"));",
+											"",
+											"    pm.globals.set(\"getJobTitleId\", data.id);",
+											"    pm.globals.set(\"getJobTitleName\", data.jobTitleName);",
+											"    console.log(\"Value variabel setJobTitleName: \", pm.globals.get(\"setJobTitleName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setJobTitleName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Tester-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n            \"jobTitleName\": \"{{setJobTitleName}}\",\n            \"jobDescription\": \"Testing aplikasi makanan\",\n            \"note\": \"melakukan testing aplikasi\",\n            \"isDeleted\": \"0\"\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobTitles",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobTitles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-title-get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200] and parse response\", function() {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    const response = pm.response.json();",
+											"",
+											"    const jobTitleName = response.data.find(item=> item.jobTitleName === pm.globals.get(\"getJobTitleName\"));",
+											"",
+											"    pm.expect(jobTitleName).to.not.be.null;",
+											"",
+											"    pm.globals.set(\"getJobTitleName\", jobTitleName.jobTitleName);",
+											"",
+											"    // menampilkan hasil ke console",
+											"    console.log(\"value setJobTitleName: \", pm.globals.get(\"setJobTitleName\"));",
+											"    console.log(\"value getJobTitleId: \", pm.globals.get(\"getJobTitleId\"));",
+											"    console.log(\"value getJobTitleName: \", pm.globals.get(\"getJobTitleName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/jobTitles",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobTitles"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										},
+										{
+											"key": "sortingField",
+											"value": "id",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-title-update",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setJobTitleName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Tester-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200]\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data for update Employee Job Title\", function () {",
+											"    ",
+											"    const jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Saved\");",
+											"",
+											"    console.log(\"Value from updating setJobTitleName: \", pm.globals.get(\"setJobTitleName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n            \"jobTitleName\": \"{{setJobTitleName}}\",\n            \"jobDescription\": \"Testing aplikasi makanan\",\n            \"note\": \"melakukan testing\",\n            \"isDeleted\": \"0\"\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobTitles/{{getJobTitleId}}",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobTitles",
+										"{{getJobTitleId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-title-delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [204]\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\" : [\"{{getJobTitleId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobTitles",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobTitles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check-job-title-doesn't-exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"check if job title data doesn't exist\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    var data = jsonData.data;",
+											"    var isJobTitleExist = false;",
+											"",
+											"    for (var i = 0; i < data.length; i++) {",
+											"        if (data[i].name === pm.globals.get(\"getJobTitleName\")) {",
+											"            isJobTitleExist = true;",
+											"            break;",
+											"        }",
+											"    }",
+											"",
+											"    pm.expect(isJobTitleExist).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/jobTitles",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobTitles"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "gender",
+					"item": [
+						{
+							"name": "req-gender-data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Verify user data\", function () {",
+											"    // Parse the response body as JSON",
+											"    var responseBody = pm.response.json();",
+											"",
+											"// Verify the status code",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    pm.expect(responseBody.data).to.be.an('array');",
+											"    ",
+											"    pm.expect(responseBody.data[0].id).to.equal(\"2\");",
+											"    pm.expect(responseBody.data[0].name).to.equal(\"Female\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/gender",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"gender"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "locations",
+					"item": [
+						{
+							"name": "locations-get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Verify user data\", function () {",
+											"    // Parse the response body as JSON",
+											"    var responseBody = pm.response.json();",
+											"",
+											"// Verify the status code",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    pm.expect(responseBody.data).to.be.an('array');",
+											"    ",
+											"    pm.expect(responseBody.data[0].name).to.equal(\"Adelaide\");",
+											"    pm.expect(responseBody.data[1].name).to.equal(\"Brisbane\");",
+											"    pm.expect(responseBody.data[2].name).to.equal(\"Cairns\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/locations?limit=10&filter[country]=AU&sortingFeild=id",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "filter[country]",
+											"value": "AU"
+										},
+										{
+											"key": "sortingFeild",
+											"value": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "locations-add",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [201]\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data from Employee Locations\", function () {",
+											"    ",
+											"    //set variable",
+											"    const jsonData = pm.response.json();",
+											"    const data = jsonData.data;",
+											"",
+											"    pm.expect(data.name).to.eql(pm.globals.get(\"setLocationsName\"));",
+											"",
+											"    pm.globals.set(\"getLocationsId\", data.id);",
+											"    pm.globals.set(\"getLocationsName\", data.name);",
+											"    console.log(\"Value variabel setLocationsName: \", pm.globals.get(\"setLocationsName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setLocationsName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Melbourne-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\":\"{{setLocationsName}}\",\n  \"city\":\"Sydney\",\n  \"phone\":\"12345\",\n  \"time_zone\":\"Australia/Sydney\",\n  \"province\":\"Province of the location\",\n  \"state\":\"State of the location\",\n  \"address\":\"test\",\n  \"zipCode\":\"12345\",\n  \"fax\":\"12345\",\n  \"notes\":\"test\",\n  \"countryCode\":\"AU\",\n  \"eeo_applicable\":0\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/locations",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "locations-get-by-id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200] and parse response\", function() {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    const response = pm.response.json();",
+											"",
+											"    const locationsName = response.data.name === pm.globals.get(\"getLocationsName\");",
+											"    ",
+											"    pm.expect(locationsName).to.not.be.null;",
+											"",
+											"    pm.globals.set(\"getLocationsName\", locationsName.name);",
+											"",
+											"    // menampilkan hasil ke console",
+											"    console.log(response);",
+											"    console.log(\"value setLocationsName: \", pm.globals.get(\"setLocationsName\"));",
+											"    console.log(\"value getLocationsId: \", pm.globals.get(\"getLocationsId\"));",
+											"    console.log(\"value getLocationsName: \", pm.globals.get(\"getLocationsName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/locations/{{getLocationsId}}",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations",
+										"{{getLocationsId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "locations-update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200]\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data for update Employee Locations\", function () {",
+											"    ",
+											"    const jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Saved\");",
+											"",
+											"    console.log(\"Value from updating setLocationsName: \", pm.globals.get(\"setLocationsName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setLocationsName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Melbourne-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\":\"{{setLocationsName}}\",\n  \"city\":\"Sydney\",\n  \"phone\":\"12345\",\n  \"time_zone\":\"Australia/Sydney\",\n  \"province\":\"Province of the location\",\n  \"state\":\"State of the location\",\n  \"address\":\"test\",\n  \"zipCode\":\"12345\",\n  \"fax\":\"12345\",\n  \"notes\":\"test\",\n  \"countryCode\":\"AU\",\n  \"eeo_applicable\":0\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/locations/{{getLocationsId}}",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations",
+										"{{getLocationsId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "locations-delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [204]\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\" : [\"{{getLocationsId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/locations",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check-locations-id-doesn't-exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"check if employee locations doesn't exist\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    var data = jsonData.data;",
+											"    var isLocationsIdExist = false;",
+											"",
+											"    for (var i = 0; i < data.length; i++) {",
+											"        if (data[i].name === pm.globals.get(\"getLocationsName\")) {",
+											"            isLocationsIdExist = true;",
+											"            break;",
+											"        }",
+											"    }",
+											"",
+											"    pm.expect(isLocationsIdExist).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/locations",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"locations"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "ethnicity",
+					"item": [
+						{
+							"name": "ethnicity-get-all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Verify user data\", function () {",
+											"    // Parse the response body as JSON",
+											"    var responseBody = pm.response.json();",
+											"",
+											"// Verify the status code",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    pm.expect(responseBody.data).to.be.an('array');",
+											"    ",
+											"    pm.expect(responseBody.data[0].name).to.equal(\"Hispanic or Latino\");",
+											"    pm.expect(responseBody.data[1].name).to.equal(\"White\");",
+											"    pm.expect(responseBody.data[2].name).to.equal(\"Black or African American\");",
+											"});",
+											"",
+											"pm.test(\"Verify user data\", function () {",
+											"    // Parse the response body as JSON",
+											"    var responseBody = pm.response.json();",
+											"",
+											"    pm.expect(responseBody.meta).to.be.an('object');",
+											"    ",
+											"    pm.expect(responseBody.meta.total).to.equal(7);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/eeoEthnicity",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"eeoEthnicity"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "job categories",
+					"item": [
+						{
+							"name": "job-categories-add",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [201]\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data from Employee Job Categories Name\", function () {",
+											"    ",
+											"    //set variable",
+											"    const jsonData = pm.response.json();",
+											"    const data = jsonData.data;",
+											"",
+											"    pm.expect(data.name).to.eql(pm.globals.get(\"setJobCategoriesName\"));",
+											"",
+											"    pm.globals.set(\"getJobCategoriesId\", data.id);",
+											"    pm.globals.set(\"getJobCategoriesName\", data.name);",
+											"    console.log(\"Value variabel setJobCategoriesName: \", pm.globals.get(\"setJobCategoriesName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setJobCategoriesName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"QA Automation-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"name\" : \"{{setJobCategoriesName}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobCategories",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobCategories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-categories-get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200] and parse response\", function() {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    const response = pm.response.json();",
+											"",
+											"    const jobCategoriesName = response.data.find(item=> item.name === pm.globals.get(\"getJobCategoriesName\"));",
+											"",
+											"    pm.expect(jobCategoriesName).to.not.be.null;",
+											"",
+											"    pm.globals.set(\"getJobCategoriesName\", jobCategoriesName.name);",
+											"",
+											"    // menampilkan hasil ke console",
+											"    console.log(\"value setJobCategoriesName: \", pm.globals.get(\"setJobCategoriesName\"));",
+											"    console.log(\"value getJobCategoriesId: \", pm.globals.get(\"getJobCategoriesId\"));",
+											"    console.log(\"value getJobCategoriesName: \", pm.globals.get(\"getJobCategoriesName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/jobCategories",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobCategories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-categories-update",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setJobCategoriesName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"QA Automation-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200]\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data for update Employee Locations\", function () {",
+											"    ",
+											"    const jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Saved\");",
+											"",
+											"    console.log(\"Value from updating setJobCategoriesName: \", pm.globals.get(\"setJobCategoriesName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"name\" : \"{{setJobCategoriesName}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobCategories/{{getJobCategoriesId}}",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobCategories",
+										"{{getJobCategoriesId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "job-categories-delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [204]\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\" : [\"{{getJobCategoriesId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/jobCategories",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobCategories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check-job-categories-doesn't-exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"check if job categories ID doesn't exist\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    var data = jsonData.data;",
+											"    var isJobCategoriesExist = false;",
+											"",
+											"    for (var i = 0; i < data.length; i++) {",
+											"        if (data[i].name === pm.globals.get(\"getJobCategoriesName\")) {",
+											"            isJobCategoriesExist = true;",
+											"            break;",
+											"        }",
+											"    }",
+											"",
+											"    pm.expect(isJobCategoriesExist).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/jobCategories",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"jobCategories"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "nationality",
+					"item": [
+						{
+							"name": "nationality-add",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setNationalityName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Las Vegas-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [201]\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data from Employee Nationality Name\", function () {",
+											"    ",
+											"    //set variable",
+											"    const jsonData = pm.response.json();",
+											"    const data = jsonData.data;",
+											"",
+											"    pm.expect(data.name).to.eql(pm.globals.get(\"setNationalityName\"));",
+											"",
+											"    pm.globals.set(\"getNationalityId\", data.id);",
+											"    pm.globals.set(\"getNationalityName\", data.name);",
+											"    console.log(\"Value variabel setNationalityName: \", pm.globals.get(\"setNationalityName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\" : \"{{setNationalityName}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/nationality",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"nationality"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "nationality-get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200] and parse response\", function() {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    const response = pm.response.json();",
+											"",
+											"    const nationalityName = response.data.find(item=> item.name === pm.globals.get(\"getNationalityName\"));",
+											"",
+											"    pm.expect(nationalityName).to.not.be.null;",
+											"",
+											"    pm.globals.set(\"getNationalityName\", nationalityName.name);",
+											"",
+											"    // menampilkan hasil ke console",
+											"    console.log(\"value setNationalityName: \", pm.globals.get(\"setNationalityName\"));",
+											"    console.log(\"value getNationalityId: \", pm.globals.get(\"getNationalityId\"));",
+											"    console.log(\"value getNationalityName: \", pm.globals.get(\"getNationalityName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/nationality",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"nationality"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "nationality-update",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(3);",
+											"",
+											"pm.globals.set(\"setNationalityName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Las Vegas-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200]\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data for update nationality name\", function () {",
+											"    ",
+											"    const jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Saved\");",
+											"",
+											"    console.log(\"Value from update setNationalityName: \", pm.globals.get(\"setNationalityName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\" : \"{{setNationalityName}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/nationality/{{getNationalityId}}",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"nationality",
+										"{{getNationalityId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "nationality-delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [204]\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\" : [\"{{getNationalityId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/nationality",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"nationality"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check-nationality-doesn't-exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"check if nationality name doesn't exist\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    var data = jsonData.data;",
+											"    var isNationalityExist = false;",
+											"",
+											"    for (var i = 0; i < data.length; i++) {",
+											"        if (data[i].name === pm.globals.get(\"getNationalityName\")) {",
+											"            isNationalityExist = true;",
+											"            break;",
+											"        }",
+											"    }",
+											"",
+											"    pm.expect(isNationalityExist).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/nationality",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"nationality"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "pay grades",
+					"item": [
+						{
+							"name": "pay-grades-add",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomText = generateRandomText(2);",
+											"",
+											"pm.globals.set(\"setPayGradesName\", randomText);",
+											"",
+											"// random text",
+											"function generateRandomText(length) {",
+											"    const characters = \"1234567890\";",
+											"    let randomText = \"Grade-\";",
+											"    for (let i = 0; i < length; i++) {",
+											"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return (randomText);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [201]\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Verify response body data from Employee Pay Grades\", function () {",
+											"    ",
+											"    //set variable",
+											"    const jsonData = pm.response.json();",
+											"    const data = jsonData.data;",
+											"",
+											"    pm.expect(data.name).to.eql(pm.globals.get(\"setPayGradesName\"));",
+											"",
+											"    pm.globals.set(\"getPayGradesId\", data.id);",
+											"    pm.globals.set(\"getPayGradesName\", data.name);",
+											"    console.log(\"Value variabel setPayGradesName: \", pm.globals.get(\"setPayGradesName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\" : \"{{setPayGradesName}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/payGrades",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"payGrades"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "pay-grades-get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"verify status code response : [200] and parse response\", function() {",
+											"    pm.response.to.have.status(200);",
+											"",
+											"    const response = pm.response.json();",
+											"",
+											"    const payGradesName = response.data.find(item=> item.name === pm.globals.get(\"getPayGradesName\"));",
+											"",
+											"    pm.expect(payGradesName).to.not.be.null;",
+											"",
+											"    pm.globals.set(\"getPayGradesName\", payGradesName.name);",
+											"",
+											"    // menampilkan hasil ke console",
+											"    console.log(\"value setPayGradesName: \", pm.globals.get(\"setPayGradesName\"));",
+											"    console.log(\"value getPayGradesId: \", pm.globals.get(\"getPayGradesId\"));",
+											"    console.log(\"value getPayGradesName: \", pm.globals.get(\"getPayGradesName\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/payGrades",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"payGrades"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "pay-grades-delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// pm.test(\"verify status code response : [204]\", function () {",
+											"//     pm.response.to.have.status(204);",
+											"// });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\" : [\"{{getPayGradesId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base-url}}/api/payGrades",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"payGrades"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check-pay-grades-doesn't-exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"check if nationality name doesn't exist\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    var data = jsonData.data;",
+											"    var isPayGradesExist = false;",
+											"",
+											"    for (var i = 0; i < data.length; i++) {",
+											"        if (data[i].name === pm.globals.get(\"getPayGradesName\")) {",
+											"            isPayGradesExist = true;",
+											"            break;",
+											"        }",
+											"    }",
+											"",
+											"    pm.expect(isPayGradesExist).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/api/payGrades",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"api",
+										"payGrades"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "attendance records",
+			"item": [
+				{
+					"name": "attendance-records-add",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [201]\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Verify response body data from Attendance Records\", function () {",
+									"    ",
+									"    //set variable",
+									"    const jsonData = pm.response.json();",
+									"    const data = jsonData.data;",
+									"",
+									"    pm.expect(data.employeeId).to.eql(pm.globals.get(\"setAttEmployeeId\"));",
+									"",
+									"    var asd = data.punchInUserTime;",
+									"    var part = asd.split(' ');",
+									"    var dateDoang = part[0];",
+									"",
+									"    pm.globals.set(\"getAttendanceId\", data.id);",
+									"    pm.globals.set(\"getAttEmployeeId\", data.employeeId);",
+									"    pm.globals.set(\"getAttendanceDate\", dateDoang);",
+									"    console.log(\"Value variabel setAttEmployeeId: \", pm.globals.get(\"setAttEmployeeId\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomText = generateRandomText(2);",
+									"",
+									"pm.globals.set(\"setAttEmployeeId\", randomText);",
+									"",
+									"// random text",
+									"function generateRandomText(length) {",
+									"    const characters = \"1234567890\";",
+									"    let randomText = \"\";",
+									"    for (let i = 0; i < length; i++) {",
+									"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+									"    }",
+									"    return (randomText);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"empNumber\":\"{{setAttEmployeeId}}\",\n  \"date\":\"2023-07-01\",\n  \"time\":\"12:40\",\n  \"timezoneOffset\":\"5.5\",\n  \"note\":\"Punch In Note\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/api/attendanceRecords",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"attendanceRecords"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "attendance-records-get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [200] and parse response\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/api/attendanceRecords?filter[fromDate]={{getAttendanceDate}}&filter[toDate]={{getAttendanceDate}}&filter[empNumbers][]\n={{getAttEmployeeId}}",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"attendanceRecords"
+							],
+							"query": [
+								{
+									"key": "filter[fromDate]",
+									"value": "{{getAttendanceDate}}"
+								},
+								{
+									"key": "filter[toDate]",
+									"value": "{{getAttendanceDate}}"
+								},
+								{
+									"key": "filter[empNumbers][]\n",
+									"value": "{{getAttEmployeeId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "attendance-records-delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [200]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify response body data for deleting attendance records\", function () {",
+									"    ",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Deleted\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ids\" : [\"{{getAttendanceId}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/api/attendanceRecords",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"attendanceRecords"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "employee",
+			"item": [
+				{
+					"name": "employee-status-add",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [201]\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Verify response body data from ID and Employee Name\", function () {",
+									"    ",
+									"    //set variable",
+									"    const jsonData = pm.response.json();",
+									"    const data = jsonData.data;",
+									"",
+									"    pm.expect(data.name).to.eql(pm.globals.get(\"setEmployeeName\"));",
+									"",
+									"    pm.globals.set(\"getEmployeeId\", data.id);",
+									"    pm.globals.set(\"getEmployeeName\", data.name);",
+									"    console.log(\"Nilai setEmployeeName: \", pm.globals.get(\"setEmployeeName\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomText = generateRandomText(12);",
+									"",
+									"pm.globals.set(\"setEmployeeName\", randomText);",
+									"",
+									"// random text",
+									"function generateRandomText(length) {",
+									"    const characters = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\";",
+									"    let randomText = \"\";",
+									"    for (let i = 0; i < length; i++) {",
+									"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+									"    }",
+									"    return randomText;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\" : \"{{setEmployeeName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/api/employmentStatus",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"employmentStatus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "employee-status-get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [200] and parse response\", function() {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    const response = pm.response.json();",
+									"",
+									"    const employeeName = response.data.find(item=> item.name === pm.globals.get(\"getEmployeeName\"));",
+									"",
+									"    pm.expect(employeeName).to.not.be.null;",
+									"",
+									"    pm.globals.set(\"getEmployeeName\", employeeName.name);",
+									"",
+									"    // menampilkan hasil ke console",
+									"    console.log(\"value setEmployeeName: \", pm.globals.get(\"setEmployeeName\"));",
+									"    console.log(\"value getEmployeeId: \", pm.globals.get(\"getEmployeeId\"));",
+									"    console.log(\"value getEmployeeName: \", pm.globals.get(\"getEmployeeName\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/api/employmentStatus",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"employmentStatus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "employee-status-update",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomText = generateRandomText(12);",
+									"",
+									"pm.globals.set(\"setEmployeeName\", randomText);",
+									"",
+									"// random text",
+									"function generateRandomText(length) {",
+									"    const characters = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\";",
+									"    let randomText = \"\";",
+									"    for (let i = 0; i < length; i++) {",
+									"        randomText += characters.charAt(Math.floor(Math.random() * characters.length));",
+									"    }",
+									"    return randomText;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [200]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify response body data for update Employee ID and Employee Name\", function () {",
+									"    ",
+									"    const jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.messages.success).to.eql(\"Successfully Saved\");",
+									"",
+									"    console.log(\"Value from update setEmployeeName: \", pm.globals.get(\"setEmployeeName\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\" : \"{{setEmployeeName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/api/employmentStatus/{{getEmployeeId}}",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"employmentStatus",
+								"{{getEmployeeId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "employee-status-delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"verify status code response : [204]\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\" : [\"{{getEmployeeId}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/api/employmentStatus",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"employmentStatus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check-employee-data-doesn't-exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"check if employee data doesn't exist\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data;",
+									"    var isEmployeeDataExist = false;",
+									"",
+									"    for (var i = 0; i < data.length; i++) {",
+									"        if (data[i].name === pm.globals.get(\"getEmployeeName\")) {",
+									"            isEmployeeDataExist = true;",
+									"            break;",
+									"        }",
+									"    }",
+									"",
+									"    pm.expect(isEmployeeDataExist).to.be.false;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/api/employmentStatus",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"api",
+								"employmentStatus"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "https://api-sandbox.orangehrm.com"
+		}
+	]
+}
